@@ -2,22 +2,21 @@ package escuelaing.edu.arsw.FlowBoard.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "tasks")
-public class Task {
-
+@Document(collection = "sprints")
+public class Sprint {
     @Id
     private String id;
-    private String titulo;
-    private String descripcion;
-    private String estado; // "TO-DO", "DOING", "DONE"
-    private String boardId; // ID del proyecto al que pertenece la tarea
-    private String sprintId; // ID del sprint al que pertenece la tarea
+    private String boardId; // ID del tablero al que pertenece el sprint
+    private String nombre;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
+    private String objetivo;
 }

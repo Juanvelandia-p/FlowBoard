@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import escuelaing.edu.arsw.FlowBoard.model.User;
-import escuelaing.edu.arsw.FlowBoard.respository.UserRepository;
+import escuelaing.edu.arsw.FlowBoard.repository.UserRepository;
 
 @Service
 public class UserService {
