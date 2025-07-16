@@ -1,7 +1,7 @@
 Juan Sebastian Velandia
 # FlowBoard
 
-FlowBoard es una plataforma web de colaboración ágil en tiempo real, diseñada para múltiples equipos que trabajan simultáneamente en contextos independientes. Permite organizar tareas utilizando metodologías ágiles como Scrum o Kanban, coordinar reuniones diarias (Daily Stand-Ups), editar tarjetas en tiempo real y facilitar la comunicación directa mediante chats por tarea.
+FlowBoard es una plataforma web de colaboración ágil en tiempo real, diseñada para múltiples equipos que trabajan simultáneamente en contextos independientes. Permite organizar tareas utilizando metodologías ágiles como Scrum , coordinar reuniones diarias (Daily Stand-Ups), editar tarjetas en tiempo real y facilitar la comunicación directa mediante chats por tarea.
 
 ## Características principales
 
