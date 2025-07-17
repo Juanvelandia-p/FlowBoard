@@ -1,4 +1,4 @@
-package escuelaing.edu.arsw.FlowBoard.webSocket;
+package escuelaing.edu.arsw.FlowBoard.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -17,6 +17,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/ws")
+            .setAllowedOrigins("http://localhost:3000") // o "*" para todos los orígenes
+            .withSockJS();
     }
 }

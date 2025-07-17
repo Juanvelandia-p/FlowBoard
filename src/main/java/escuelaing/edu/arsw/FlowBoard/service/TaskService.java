@@ -3,15 +3,21 @@ package escuelaing.edu.arsw.FlowBoard.service;
 import escuelaing.edu.arsw.FlowBoard.model.Task;
 import escuelaing.edu.arsw.FlowBoard.repository.TaskRepository;
 import org.springframework.stereotype.Service;
+import escuelaing.edu.arsw.FlowBoard.webSocket.TaskDragWebSocketController.TaskDragEvent;
+import escuelaing.edu.arsw.FlowBoard.webSocket.TaskDragWebSocketController;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final TaskDragWebSocketController taskDragWebSocketController;
 
-    public TaskService(TaskRepository taskRepository) {
+    @Autowired
+    public TaskService(TaskRepository taskRepository, TaskDragWebSocketController taskDragWebSocketController) {
         this.taskRepository = taskRepository;
+        this.taskDragWebSocketController = taskDragWebSocketController;
     }
 
     public Task createTask(Task task) {
@@ -48,8 +54,18 @@ public class TaskService {
         Optional<Task> taskOpt = taskRepository.findById(id);
         if (taskOpt.isPresent()) {
             Task task = taskOpt.get();
+            String oldStatus = task.getEstado();
             task.setEstado(nuevoEstado);
-            return taskRepository.save(task);
+            Task updatedTask = taskRepository.save(task);
+            // Emitir evento WebSocket
+            TaskDragEvent event = new TaskDragEvent();
+            event.taskId = id;
+            event.fromStatus = oldStatus;
+            event.toStatus = nuevoEstado;
+            event.boardId = task.getBoardId();
+            // Puedes agregar userId si lo tienes disponible
+            taskDragWebSocketController.sendTaskDragEvent(event, task.getBoardId());
+            return updatedTask;
         }
         throw new IllegalArgumentException("Task not found");
     }

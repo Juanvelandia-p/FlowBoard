@@ -13,10 +13,8 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/users/register", "/api/users/login").permitAll()
-                .anyRequest().authenticated()
-            )
-            .httpBasic();
+                .anyRequest().permitAll()
+            );
         return http.build();
     }
 }
