@@ -16,7 +16,6 @@ import escuelaing.edu.arsw.FlowBoard.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -24,20 +23,10 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserDTO userDTO) {
         try {
-            userService.registerUser(userDTO.getNombre(), userDTO.getEmail(), userDTO.getContrasena());
+            userService.registerUser(userDTO.getUsername(), userDTO.getEmail(), userDTO.getPassword());
             return ResponseEntity.ok("User registered successfully");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> logIn(@RequestBody LoginDTO loginDTO) {
-        try {
-            String token = userService.logIn(loginDTO.getEmail(), loginDTO.getContrasena());
-            return ResponseEntity.ok(token);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 }
