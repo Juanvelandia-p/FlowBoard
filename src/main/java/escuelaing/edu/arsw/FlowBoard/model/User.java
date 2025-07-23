@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import org.springframework.data.annotation.Id;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,4 +19,5 @@ public class User {
     private String nombre;
     private String correo;
     private String contrasena;
+    private List<String> roles; // Ejemplo: ["USER"], ["ADMIN"]
 }

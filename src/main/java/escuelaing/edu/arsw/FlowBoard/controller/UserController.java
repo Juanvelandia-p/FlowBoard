@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,6 @@ import escuelaing.edu.arsw.FlowBoard.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -24,20 +24,20 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserDTO userDTO) {
         try {
-            userService.registerUser(userDTO.getNombre(), userDTO.getEmail(), userDTO.getContrasena());
+            userService.registerUser(userDTO.getUsername(), userDTO.getEmail(), userDTO.getPassword());
             return ResponseEntity.ok("User registered successfully");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> logIn(@RequestBody LoginDTO loginDTO) {
-        try {
-            String token = userService.logIn(loginDTO.getEmail(), loginDTO.getContrasena());
-            return ResponseEntity.ok(token);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    @PostMapping("/userID")
+    public ResponseEntity<String> getUserIdByEmail(@RequestBody String email) {
+        String userId = userService.getUserIdByEmail(email);
+        if (userId != null) {
+            return ResponseEntity.ok(userId);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 }

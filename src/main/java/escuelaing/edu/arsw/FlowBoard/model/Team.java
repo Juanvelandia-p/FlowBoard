@@ -17,5 +17,6 @@ public class Team {
     private String name;
     private String leaderId;
     private List<String> memberIds; // IDs de los usuarios
+    private List<String> pendingInvitations; // <-- NUEVO: lista de correos invitados pendientes
     // Puedes agregar descripción, fecha de creación, etc.
 }
