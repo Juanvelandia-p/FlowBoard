@@ -25,4 +25,5 @@ public class TaskChatWebSocketController {
         Message saved = messageService.createMessage(message);
         messagingTemplate.convertAndSend("/topic/task-chat." + message.getTaskId(), saved);
     }
+
 }

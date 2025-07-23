@@ -4,7 +4,10 @@ import escuelaing.edu.arsw.FlowBoard.model.Sprint;
 import escuelaing.edu.arsw.FlowBoard.service.SprintService;
 import escuelaing.edu.arsw.FlowBoard.service.TaskService;
 import escuelaing.edu.arsw.FlowBoard.model.Task;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +17,8 @@ import java.util.Optional;
 public class SprintController {
     private final SprintService sprintService;
     private final TaskService taskService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     public SprintController(SprintService sprintService, TaskService taskService) {
         this.sprintService = sprintService;
@@ -25,10 +30,12 @@ public class SprintController {
         return ResponseEntity.ok(taskService.getTasksBySprintId(sprintId));
     }
 
-    // Endpoint para crear un nuevo sprint
     @PostMapping
-    public ResponseEntity<Sprint> createSprint(@RequestBody Sprint sprint) {
-        return ResponseEntity.ok(sprintService.createSprint(sprint));
+    public Sprint createSprint(@RequestBody Sprint sprint) {
+        Sprint saved = sprintService.createSprint(sprint);
+        // Notifica a todos los usuarios del board
+        messagingTemplate.convertAndSend("/topic/board-sprints." + saved.getBoardId(), saved);
+        return saved;
     }
     // Endpoint para obtener sprints por ID de tablero
     @GetMapping("/board/{boardId}")
