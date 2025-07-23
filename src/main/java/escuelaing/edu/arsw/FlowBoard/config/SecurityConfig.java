@@ -20,8 +20,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
@@ -74,20 +74,18 @@ public class SecurityConfig {
             String header = request.getHeader("Authorization");
             if (header != null && header.startsWith("Bearer ")) {
                 String token = header.substring(7);
-                try {
-                    Claims claims = jwtUtil.validateToken(token);
-                    String username = claims.getSubject();
-                    List<String> roles = (List<String>) claims.get("roles");
-                    List<SimpleGrantedAuthority> authorities = roles.stream()
-                            .map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toList());
-
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(username, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                } catch (Exception e) {
-                    // Token inválido, continuar sin autenticar
+                Claims claims = jwtUtil.validateToken(token);
+                String email = claims.getSubject();
+                Object rolesObj = claims.get("roles");
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                if (rolesObj instanceof List<?> rolesList) {
+                    for (Object role : rolesList) {
+                        authorities.add(new SimpleGrantedAuthority(role.toString()));
+                    }
                 }
+                UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(email, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
             chain.doFilter(request, response);
         }

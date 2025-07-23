@@ -16,7 +16,7 @@ public class Board {
     
     @Id
     private String id;
-    private String nombre;
+    private String name;
     private String teamId; // ID del usuario que creó el board
 
     // puedes agregar más adelante: descripción, fechaCreación, etc.

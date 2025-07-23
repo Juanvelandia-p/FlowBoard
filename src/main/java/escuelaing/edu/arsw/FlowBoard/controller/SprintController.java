@@ -30,23 +30,23 @@ public class SprintController {
     public ResponseEntity<Sprint> createSprint(@RequestBody Sprint sprint) {
         return ResponseEntity.ok(sprintService.createSprint(sprint));
     }
-
+    // Endpoint para obtener sprints por ID de tablero
     @GetMapping("/board/{boardId}")
     public ResponseEntity<List<Sprint>> getSprintsByBoard(@PathVariable String boardId) {
         return ResponseEntity.ok(sprintService.getSprintsByBoardId(boardId));
     }
-
+    // Endpoint para obtener un sprint por ID
     @GetMapping("/{id}")
     public ResponseEntity<Sprint> getSprintById(@PathVariable String id) {
         Optional<Sprint> sprint = sprintService.getSprintById(id);
         return sprint.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    // Endpoint para actualizar un sprint
     @PutMapping
     public ResponseEntity<Sprint> updateSprint(@RequestBody Sprint sprint) {
         return ResponseEntity.ok(sprintService.updateSprint(sprint));
     }
-
+    // Endpoint para eliminar un sprint
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSprint(@PathVariable String id) {
         sprintService.deleteSprint(id);

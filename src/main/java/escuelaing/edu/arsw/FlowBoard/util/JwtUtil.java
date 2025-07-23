@@ -20,10 +20,10 @@ public class JwtUtil {
     public String generateToken(String username, List<String> roles) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("roles", roles)
+                .claim("roles", roles) // <-- esto es clave
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(key, SignatureAlgorithm.HS256) // <-- CORRECTO
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 

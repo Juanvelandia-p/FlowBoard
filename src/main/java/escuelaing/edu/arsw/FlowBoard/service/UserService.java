@@ -33,4 +33,9 @@ public class UserService {
         // Find the user by email
         return userRepository.findByCorreo(email);
     }
+
+    public String getUserIdByEmail(String email) {
+        User user = userRepository.findByCorreo(email);
+        return user != null ? user.getId() : null;
+    }
 }

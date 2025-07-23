@@ -22,6 +22,7 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // Endpoint para registrar un nuevo usuario
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginRequest) {
         String email = loginRequest.getEmail();
