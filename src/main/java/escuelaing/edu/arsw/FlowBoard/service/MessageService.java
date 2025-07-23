@@ -20,9 +20,7 @@ public class MessageService {
     }
 
     public List<Message> getMessagesByTaskId(String taskId) {
-        return messageRepository.findAll().stream()
-            .filter(msg -> taskId.equals(msg.getTaskId()))
-            .toList();
+        return messageRepository.findByTaskId(taskId);
     }
 
     public Optional<Message> getMessageById(String id) {

@@ -2,7 +2,10 @@ package escuelaing.edu.arsw.FlowBoard.controller;
 
 import escuelaing.edu.arsw.FlowBoard.model.Task;
 import escuelaing.edu.arsw.FlowBoard.service.TaskService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
@@ -11,14 +14,19 @@ import java.util.Optional;
 @RequestMapping("/api/tasks")
 public class TaskController {
     private final TaskService taskService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
     // Endpoints para manejar tareas
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
-        return ResponseEntity.ok(taskService.createTask(task));
+    public Task createTask(@RequestBody Task task) {
+        Task saved = taskService.createTask(task);
+        // Notifica a todos los usuarios del sprint
+        messagingTemplate.convertAndSend("/topic/sprint-tasks." + saved.getSprintId(), saved);
+        return saved;
     }
     // Endpoint para obtener todas las tareas
     @GetMapping("/board/{boardId}")

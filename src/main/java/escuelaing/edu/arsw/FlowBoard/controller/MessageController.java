@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -23,8 +24,13 @@ public class MessageController {
     }
     // Endpoint para obtener mensajes por ID de tarea
     @GetMapping("/task/{taskId}")
-    public ResponseEntity<List<Message>> getMessagesByTask(@PathVariable String taskId) {
-        return ResponseEntity.ok(messageService.getMessagesByTaskId(taskId));
+    public ResponseEntity<List<Message>> getMessagesByTask(@PathVariable String taskId, Authentication auth) {
+        List<Message> messages = messageService.getMessagesByTaskId(taskId);
+        System.out.println("Messages for task " + taskId + ": " + messages);
+        if (messages.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(messages);
     }
     // Endpoint para obtener todos los mensajes
     @GetMapping("/{id}")
