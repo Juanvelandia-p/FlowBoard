@@ -28,8 +28,9 @@ FlowBoard es un backend concurrente construido con **Spring Boot** que expone un
 8. [Scripts útiles](#scripts-útiles)
 9. [Pruebas](#pruebas)
 10. [Despliegue](#despliegue)
-11. [Contribución](#contribución)
-12. [Licencia](#licencia)
+11. [CI/CD](#cicd)
+12. [Contribución](#contribución)
+13. [Licencia](#licencia)
 
 ---
 
@@ -71,6 +72,13 @@ FlowBoard es un backend concurrente construido con **Spring Boot** que expone un
 | **Build** | Apache Maven (Maven Wrapper incluido) |
 | **Frontend** | React (repositorio independiente) |
 | **Despliegue** | Azure App Service / Azure Static Web Apps |
+
+### Requisitos no funcionales prioritarios
+
+| NFR | Cómo el diseño lo aborda |
+|---|---|
+| **Seguridad** | Autenticación y autorización con Spring Security + JWT; secretos gestionados exclusivamente mediante variables de entorno y GitHub Secrets (nunca en el código fuente); CORS configurado para orígenes controlados; HTTPS en Azure App Service. |
+| **Alta disponibilidad** | Despliegue en Azure App Service con soporte de escalado administrado; MongoDB Atlas con replicación integrada y `retryWrites=true`; pipeline CI/CD automatizado que garantiza despliegues consistentes y repetibles al slot de producción sin intervención manual. |
 
 ---
 
@@ -576,6 +584,49 @@ Para desplegar el backend en Azure App Service:
 3. Subir el JAR generado en `target/FlowBoard-0.0.1-SNAPSHOT.jar` a Azure App Service.
 
 Para añadir nuevos orígenes permitidos, editar `src/main/java/escuelaing/edu/arsw/FlowBoard/config/WebSocketConfig.java`.
+
+---
+
+## CI/CD
+
+FlowBoard utiliza **GitHub Actions** para automatizar la integración y el despliegue continuo. El pipeline está definido en `.github/workflows/main_flowboard.yml`.
+
+### Disparadores (Triggers)
+
+| Evento | Rama | Descripción |
+|---|---|---|
+| `push` | `main` | Ejecuta el pipeline automáticamente al integrar cambios en la rama principal |
+| `workflow_dispatch` | cualquiera | Permite disparar el pipeline manualmente desde la interfaz de GitHub |
+
+### Etapas del pipeline
+
+El pipeline se compone de dos jobs secuenciales: `build` → `deploy`.
+
+#### 1. `build` — Compilación y empaquetado
+
+| Paso | Acción / Comando | Descripción |
+|---|---|---|
+| Checkout | `actions/checkout@v4` | Clona el código fuente del repositorio |
+| Configurar Java | `actions/setup-java@v4` | Configura Java 17 (distribución Microsoft) |
+| Compilar y probar | `mvn clean install` | Compila el proyecto, ejecuta la suite de pruebas y genera el JAR |
+| Subir artefacto | `actions/upload-artifact@v4` | Publica el JAR (`target/*.jar`) para el job de despliegue |
+
+> **Gestión de secretos:** La variable `MONGODB_URI` se inyecta como GitHub Secret durante el build (`secrets.MONGODB_URI`), evitando exponer credenciales en el código fuente.
+
+#### 2. `deploy` — Despliegue en Azure
+
+| Paso | Acción | Descripción |
+|---|---|---|
+| Descargar artefacto | `actions/download-artifact@v4` | Recupera el JAR generado en la etapa anterior |
+| Autenticar en Azure | `azure/login@v2` | Autentica mediante OIDC (Workload Identity Federation) usando secretos de servicio almacenados en GitHub |
+| Desplegar | `azure/webapps-deploy@v3` | Despliega el JAR al slot `Production` del Azure App Service `Flowboard` |
+
+La autenticación con Azure utiliza credenciales federadas (client ID, tenant ID y subscription ID) almacenadas como GitHub Secrets, sin claves de larga duración ni contraseñas en el repositorio.
+
+### Estrategia de ramas y promoción de ambientes
+
+- La rama **`main`** es la rama de producción. Todo push a `main` desencadena automáticamente un nuevo despliegue al entorno de producción en Azure.
+- Se recomienda trabajar en ramas de feature (`feature/<nombre>`) y abrir un **Pull Request** hacia `main` para revisión antes de integrar (ver sección [Contribución](#contribución)).
 
 ---
 
