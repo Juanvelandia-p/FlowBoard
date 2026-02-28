@@ -77,7 +77,7 @@ FlowBoard is a concurrent backend built with **Spring Boot** that exposes a REST
 
 ```mermaid
 classDiagram
-direction TB
+direction LR
 
 namespace model {
   class User {
@@ -136,48 +136,6 @@ namespace model {
   }
 }
 
-namespace repository {
-  class UserRepository <<Repository>>
-  class TeamRepository <<Repository>>
-  class BoardRepository <<Repository>>
-  class ColumnRepository <<Repository>>
-  class SprintRepository <<Repository>>
-  class TaskRepository <<Repository>>
-  class MessageRepository <<Repository>>
-}
-
-namespace service {
-  class UserService <<Service>>
-  class TeamService <<Service>>
-  class BoardService <<Service>>
-  class SprintService <<Service>>
-  class TaskService <<Service>>
-  class MessageService <<Service>>
-}
-
-namespace controller {
-  class UserController <<REST>>
-  class AuthController <<REST>>
-  class TeamController <<REST>>
-  class BoardController <<REST>>
-  class SprintController <<REST>>
-  class TaskController <<REST>>
-  class MessageController <<REST>>
-}
-
-namespace webSocket {
-  class TaskChatWebSocketController <<WebSocket>>
-  class TaskDragWebSocketController <<WebSocket>>
-  class TaskDragEvent
-}
-
-namespace dto {
-  class UserDTO
-  class LoginDTO
-}
-
-class JwtUtil <<Utility>>
-
 Team "1" --> "1..*" User : memberIds
 Team "1" --> "0..*" User : pendingInvitations
 Board "1" --> "1" Team : teamId
@@ -187,40 +145,6 @@ Task "0..*" --> "1" Board : boardId
 Task "0..*" --> "0..1" Sprint : sprintId
 Message "0..*" --> "1" Task : taskId
 Message "0..*" --> "1" User : userId
-
-UserRepository --> User
-TeamRepository --> Team
-BoardRepository --> Board
-ColumnRepository --> Column
-SprintRepository --> Sprint
-TaskRepository --> Task
-MessageRepository --> Message
-
-UserService --> UserRepository
-TeamService --> TeamRepository
-TeamService --> UserService
-BoardService --> BoardRepository
-SprintService --> SprintRepository
-TaskService --> TaskRepository
-TaskService --> TaskDragWebSocketController
-MessageService --> MessageRepository
-
-UserController --> UserService
-AuthController --> UserService
-AuthController --> JwtUtil
-TeamController --> TeamService
-TeamController --> UserService
-TeamController --> BoardService
-BoardController --> BoardService
-SprintController --> SprintService
-SprintController --> TaskService
-TaskController --> TaskService
-MessageController --> MessageService
-
-TaskChatWebSocketController --> MessageService
-TaskDragWebSocketController --> TaskDragEvent
-AuthController --> LoginDTO
-UserController --> UserDTO
 ```
 
 ---
