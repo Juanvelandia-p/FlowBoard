@@ -1,53 +1,54 @@
 # FlowBoard
 
-> **Plataforma web de gestión ágil de proyectos con colaboración en tiempo real.**
+> **Agile project management web platform with real-time collaboration.**
 
-FlowBoard es un backend concurrente construido con **Spring Boot** que expone una API REST y canales WebSocket para soportar la gestión de tareas al estilo Kanban/Scrum. Está diseñado para equipos que necesitan colaborar simultáneamente: los cambios en tableros y tareas se propagan al instante a todos los participantes conectados.
+FlowBoard is a concurrent backend built with **Spring Boot** that exposes a REST API and WebSocket channels to support Kanban/Scrum-style task management. It is designed for teams that need to collaborate simultaneously: changes to boards and tasks are instantly propagated to all connected participants.
 
-**Caso de uso principal:** Equipos de desarrollo de software, grupos de estudio, hackatones y comunidades de práctica que requieren coordinar sprints, asignar tareas y chatear en contexto sin depender de herramientas corporativas complejas.
+**Primary use case:** Software development teams, study groups, hackathons, and communities of practice that need to coordinate sprints, assign tasks, and chat in context without relying on complex corporate tooling.
 
-**Público objetivo:** Desarrolladores backend/fullstack, equipos ágiles y cualquier organización que busque una solución liviana y extensible para la gestión de proyectos colaborativos.
+**Target audience:** Backend/fullstack developers, agile teams, and any organization looking for a lightweight and extensible solution for collaborative project management.
 
 ---
 
-## Tabla de contenidos
+## Table of Contents
 
-1. [Funcionalidades principales](#funcionalidades-principales)
-2. [Arquitectura y stack tecnológico](#arquitectura-y-stack-tecnológico)
-3. [Diagrama de clases](#diagrama-de-clases)
-4. [Instalación y ejecución local](#instalación-y-ejecución-local)
-5. [Variables de entorno](#variables-de-entorno)
-6. [API REST — Endpoints](#api-rest--endpoints)
-   - [Autenticación y usuarios](#autenticación-y-usuarios)
-   - [Equipos](#equipos)
-   - [Tableros](#tableros)
+1. [Key Features](#key-features)
+2. [Architecture & Tech Stack](#architecture--tech-stack)
+3. [Class Diagram](#class-diagram)
+4. [Local Installation & Setup](#local-installation--setup)
+5. [Environment Variables](#environment-variables)
+6. [REST API — Endpoints](#rest-api--endpoints)
+   - [Authentication & Users](#authentication--users)
+   - [Teams](#teams)
+   - [Boards](#boards)
    - [Sprints](#sprints)
-   - [Tareas](#tareas)
-   - [Mensajes](#mensajes)
+   - [Tasks](#tasks)
+   - [Messages](#messages)
 7. [WebSocket API](#websocket-api)
-8. [Scripts útiles](#scripts-útiles)
-9. [Pruebas](#pruebas)
-10. [Despliegue](#despliegue)
-11. [Contribución](#contribución)
-12. [Licencia](#licencia)
+8. [Useful Scripts](#useful-scripts)
+9. [Testing](#testing)
+10. [Deployment](#deployment)
+11. [CI/CD](#cicd)
+12. [Contributing](#contributing)
+13. [License](#license)
 
 ---
 
-## Funcionalidades principales
+## Key Features
 
-| Funcionalidad | Descripción |
+| Feature | Description |
 |---|---|
-| **Gestión de equipos** | Crear equipos, invitar miembros por correo y aceptar invitaciones pendientes. |
-| **Tableros Kanban/Scrum** | Cada equipo dispone de un tablero con columnas `TO-DO`, `DOING` y `DONE`. |
-| **Sprints** | Crear y gestionar sprints asociados a un tablero con fechas de inicio/fin y objetivo. |
-| **Gestión de tareas** | CRUD completo de tareas con cambio de estado en tiempo real. |
-| **Chat por tarea** | Mensajería contextualizada: cada tarea tiene su propio hilo de mensajes. |
-| **Colaboración en tiempo real** | Actualizaciones de tareas y chats transmitidas vía WebSocket (STOMP/SockJS). |
-| **Autenticación con JWT** | Registro, inicio de sesión y protección de endpoints con tokens JWT. |
+| **Team management** | Create teams, invite members by email, and accept pending invitations. |
+| **Kanban/Scrum boards** | Each team has a board with `TO-DO`, `DOING`, and `DONE` columns. |
+| **Sprints** | Create and manage sprints linked to a board with start/end dates and a goal. |
+| **Task management** | Full CRUD for tasks with real-time status updates. |
+| **Per-task chat** | Contextual messaging: each task has its own message thread. |
+| **Real-time collaboration** | Task updates and chats broadcast via WebSocket (STOMP/SockJS). |
+| **JWT authentication** | Registration, login, and endpoint protection with JWT tokens. |
 
 ---
 
-## Arquitectura y stack tecnológico
+## Architecture & Tech Stack
 
 ```
 ┌──────────────────────┐        REST / WebSocket         ┌───────────────────────┐
@@ -60,58 +61,65 @@ FlowBoard es un backend concurrente construido con **Spring Boot** que expone un
                                                           └───────────────────────┘
 ```
 
-| Capa | Tecnología |
+| Layer | Technology |
 |---|---|
-| **Lenguaje** | Java 17 |
+| **Language** | Java 17 |
 | **Framework** | Spring Boot 3.5.3 |
-| **Base de datos** | MongoDB (Spring Data MongoDB) |
-| **Seguridad** | Spring Security + JWT (`jjwt 0.11.5`) |
-| **Tiempo real** | WebSocket con STOMP y SockJS |
-| **Utilidades** | Lombok, Spring Boot DevTools |
-| **Build** | Apache Maven (Maven Wrapper incluido) |
-| **Frontend** | React (repositorio independiente) |
-| **Despliegue** | Azure App Service / Azure Static Web Apps |
+| **Database** | MongoDB (Spring Data MongoDB) |
+| **Security** | Spring Security + JWT (`jjwt 0.11.5`) |
+| **Real-time** | WebSocket with STOMP and SockJS |
+| **Utilities** | Lombok, Spring Boot DevTools |
+| **Build** | Apache Maven (Maven Wrapper included) |
+| **Frontend** | React (independent repository) |
+| **Deployment** | Azure App Service / Azure Static Web Apps |
+
+### Priority Non-Functional Requirements
+
+| NFR | How the design addresses it |
+|---|---|
+| **Security** | Authentication and authorization via Spring Security + JWT; secrets managed exclusively through environment variables and GitHub Secrets (never in source code); CORS restricted to controlled origins; HTTPS enforced on Azure App Service. |
+| **High Availability** | Deployment on Azure App Service with managed scaling support; MongoDB Atlas with built-in replication and `retryWrites=true`; automated CI/CD pipeline that ensures consistent and repeatable deployments to the production slot without manual intervention. |
 
 ---
 
-## Diagrama de clases
+## Class Diagram
 
-![Diagrama de clases](resources/1.png)
+![Class Diagram](resources/1.png)
 
 ---
 
-## Instalación y ejecución local
+## Local Installation & Setup
 
-### Prerrequisitos
+### Prerequisites
 
-- Java 17 o superior
-- Maven 3.8+ (o usar el wrapper incluido `./mvnw`)
-- Instancia de MongoDB accesible (local o MongoDB Atlas)
+- Java 17 or higher
+- Maven 3.8+ (or use the included wrapper `./mvnw`)
+- An accessible MongoDB instance (local or MongoDB Atlas)
 
-### Pasos
+### Steps
 
-1. **Clonar el repositorio:**
+1. **Clone the repository:**
 
    ```bash
    git clone https://github.com/Juanvelandia-p/FlowBoard.git
    cd FlowBoard
    ```
 
-2. **Configurar la variable de entorno** (ver sección [Variables de entorno](#variables-de-entorno)):
+2. **Set the environment variable** (see [Environment Variables](#environment-variables)):
 
    ```bash
-   export MONGODB_URI="mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/<db>?retryWrites=true&w=majority"
+   export MONGODB_URI="mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<db>?retryWrites=true&w=majority"
    ```
 
-3. **Compilar y ejecutar el backend:**
+3. **Build and run the backend:**
 
    ```bash
    ./mvnw spring-boot:run
    ```
 
-   La API quedará disponible en `http://localhost:8080`.
+   The API will be available at `http://localhost:8080`.
 
-4. **Verificar que la aplicación está corriendo:**
+4. **Verify the application is running:**
 
    ```bash
    curl http://localhost:8080/api/teams
@@ -119,15 +127,15 @@ FlowBoard es un backend concurrente construido con **Spring Boot** que expone un
 
 ---
 
-## Variables de entorno
+## Environment Variables
 
-| Variable | Descripción | Requerida |
+| Variable | Description | Required |
 |---|---|---|
-| `MONGODB_URI` | URI de conexión a MongoDB (incluyendo credenciales y nombre de la base de datos) | ✅ Sí |
+| `MONGODB_URI` | MongoDB connection URI (including credentials and database name) | ✅ Yes |
 
-> **Nota de seguridad:** Nunca incluyas credenciales reales en el código fuente ni en el control de versiones. Usa variables de entorno, un archivo `.env` (excluido del repositorio) o un gestor de secretos.
+> **Security note:** Never include real credentials in source code or version control. Use environment variables, a `.env` file (excluded from the repository), or a secrets manager.
 
-Ejemplo de archivo `.env` local (no commitear):
+Example local `.env` file (do not commit):
 
 ```env
 MONGODB_URI=mongodb://localhost:27017/flowboard
@@ -135,21 +143,21 @@ MONGODB_URI=mongodb://localhost:27017/flowboard
 
 ---
 
-## API REST — Endpoints
+## REST API — Endpoints
 
-Todos los endpoints protegidos requieren el header:
+All protected endpoints require the following header:
 
 ```
 Authorization: Bearer <jwt_token>
 ```
 
-El token se obtiene en el endpoint de login.
+The token is obtained from the login endpoint.
 
 ---
 
-### Autenticación y usuarios
+### Authentication & Users
 
-#### `POST /api/users/register` — Registrar usuario
+#### `POST /api/users/register` — Register a user
 
 **Request:**
 ```json
@@ -167,7 +175,7 @@ User registered successfully
 
 ---
 
-#### `POST /api/auth/login` — Iniciar sesión
+#### `POST /api/auth/login` — Log in
 
 **Request:**
 ```json
@@ -186,14 +194,14 @@ User registered successfully
 
 **Response `401 Unauthorized`:**
 ```
-Credenciales inválidas
+Invalid credentials
 ```
 
 ---
 
-#### `POST /api/users/userID` — Obtener ID de usuario por email
+#### `POST /api/users/userID` — Get user ID by email
 
-> Requiere autenticación.
+> Requires authentication.
 
 **Request body:** `"juan@example.com"`
 
@@ -201,17 +209,17 @@ Credenciales inválidas
 
 ---
 
-### Equipos
+### Teams
 
-#### `POST /api/teams` — Crear equipo
+#### `POST /api/teams` — Create a team
 
-> Requiere autenticación. El líder es el usuario autenticado.
+> Requires authentication. The authenticated user becomes the team leader.
 
 **Request:**
 ```json
 {
-  "name": "Equipo Alpha",
-  "invitedEmails": ["colaborador@example.com"]
+  "name": "Team Alpha",
+  "invitedEmails": ["collaborator@example.com"]
 }
 ```
 
@@ -219,100 +227,100 @@ Credenciales inválidas
 ```json
 {
   "id": "64b1f...",
-  "name": "Equipo Alpha",
+  "name": "Team Alpha",
   "leaderId": "64a0e...",
   "memberIds": ["64a0e..."],
-  "pendingInvitations": ["colaborador@example.com"]
+  "pendingInvitations": ["collaborator@example.com"]
 }
 ```
 
-> Al crear un equipo se crea automáticamente un tablero asociado con el nombre `"<nombre> Board"`.
+> When a team is created, an associated board named `"<team name> Board"` is automatically created.
 
 ---
 
-#### `GET /api/teams/my` — Equipos del usuario autenticado
+#### `GET /api/teams/my` — Teams of the authenticated user
 
-> Requiere autenticación.
+> Requires authentication.
 
-**Response `200 OK`:** Lista de equipos donde el usuario es miembro.
-
----
-
-#### `GET /api/teams/pending-invitations` — Invitaciones pendientes
-
-> Requiere autenticación.
-
-**Response `200 OK`:** Lista de equipos que tienen al usuario autenticado en `pendingInvitations`.
+**Response `200 OK`:** List of teams where the user is a member.
 
 ---
 
-#### `POST /api/teams/{teamId}/accept-invitation` — Aceptar invitación
+#### `GET /api/teams/pending-invitations` — Pending invitations
 
-> Requiere autenticación.
+> Requires authentication.
 
-**Response `200 OK`:** `"Invitación aceptada"`
-
----
-
-#### `GET /api/teams` — Listar todos los equipos
-
-**Response `200 OK`:** Array de equipos.
+**Response `200 OK`:** List of teams that have the authenticated user in `pendingInvitations`.
 
 ---
 
-#### `GET /api/teams/{id}` — Obtener equipo por ID
+#### `POST /api/teams/{teamId}/accept-invitation` — Accept an invitation
 
-**Response `200 OK`:** Objeto `Team`. `404` si no existe.
+> Requires authentication.
 
----
-
-#### `PUT /api/teams` — Actualizar equipo
-
-**Request:** Objeto `Team` completo con `id`.
+**Response `200 OK`:** `"Invitation accepted"`
 
 ---
 
-#### `DELETE /api/teams/{id}` — Eliminar equipo
+#### `GET /api/teams` — List all teams
+
+**Response `200 OK`:** Array of teams.
+
+---
+
+#### `GET /api/teams/{id}` — Get team by ID
+
+**Response `200 OK`:** `Team` object. `404` if not found.
+
+---
+
+#### `PUT /api/teams` — Update a team
+
+**Request:** Full `Team` object including `id`.
+
+---
+
+#### `DELETE /api/teams/{id}` — Delete a team
 
 **Response `204 No Content`**
 
 ---
 
-### Tableros
+### Boards
 
-#### `POST /api/boards` — Crear tablero
+#### `POST /api/boards` — Create a board
 
 **Request:**
 ```json
 {
-  "name": "Mi Tablero",
+  "name": "My Board",
   "teamId": "64b1f..."
 }
 ```
 
-**Response `200 OK`:** Objeto `Board` creado.
+**Response `200 OK`:** Created `Board` object.
 
 ---
 
-#### `GET /api/boards/team/{teamId}` — Tableros de un equipo
+#### `GET /api/boards/team/{teamId}` — Boards for a team
 
-**Response `200 OK`:** Lista de tableros del equipo.
-
----
-
-#### `GET /api/boards/{id}` — Obtener tablero por ID
-
-**Response `200 OK`:** Objeto `Board`. `404` si no existe.
+**Response `200 OK`:** List of boards for the team.
 
 ---
 
-#### `PUT /api/boards` — Actualizar tablero
+#### `GET /api/boards/{id}` — Get board by ID
 
-**Request:** Objeto `Board` completo con `id`.
+**Response `200 OK`:** `Board` object. `404` if not found.
 
 ---
 
-#### `DELETE /api/boards/{id}` — Eliminar tablero
+#### `PUT /api/boards` — Update a board
+
+**Request:** Full `Board` object including `id`.
+
+---
+
+#### `DELETE /api/boards/{id}` — Delete a board
 
 **Response `204 No Content`**
 
@@ -320,9 +328,9 @@ Credenciales inválidas
 
 ### Sprints
 
-#### `POST /api/sprints` — Crear sprint
+#### `POST /api/sprints` — Create a sprint
 
-> Al crear un sprint, se notifica en tiempo real al canal `/topic/board-sprints.{boardId}`.
+> When a sprint is created, a real-time notification is sent to the `/topic/board-sprints.{boardId}` channel.
 
 **Request:**
 ```json
@@ -331,143 +339,143 @@ Credenciales inválidas
   "nombre": "Sprint 1",
   "fechaInicio": "2025-01-01",
   "fechaFin": "2025-01-14",
-  "objetivo": "Implementar módulo de autenticación"
+  "objetivo": "Implement authentication module"
 }
 ```
 
-**Response `200 OK`:** Objeto `Sprint` creado.
+**Response `200 OK`:** Created `Sprint` object.
 
 ---
 
-#### `GET /api/sprints/board/{boardId}` — Sprints de un tablero
+#### `GET /api/sprints/board/{boardId}` — Sprints for a board
 
-**Response `200 OK`:** Lista de sprints asociados al tablero.
-
----
-
-#### `GET /api/sprints/{sprintId}/tasks` — Tareas de un sprint
-
-**Response `200 OK`:** Lista de tareas del sprint.
+**Response `200 OK`:** List of sprints associated with the board.
 
 ---
 
-#### `GET /api/sprints/{id}` — Obtener sprint por ID
+#### `GET /api/sprints/{sprintId}/tasks` — Tasks in a sprint
 
-**Response `200 OK`:** Objeto `Sprint`. `404` si no existe.
-
----
-
-#### `PUT /api/sprints` — Actualizar sprint
-
-**Request:** Objeto `Sprint` completo con `id`.
+**Response `200 OK`:** List of tasks in the sprint.
 
 ---
 
-#### `DELETE /api/sprints/{id}` — Eliminar sprint
+#### `GET /api/sprints/{id}` — Get sprint by ID
+
+**Response `200 OK`:** `Sprint` object. `404` if not found.
+
+---
+
+#### `PUT /api/sprints` — Update a sprint
+
+**Request:** Full `Sprint` object including `id`.
+
+---
+
+#### `DELETE /api/sprints/{id}` — Delete a sprint
 
 **Response `204 No Content`**
 
 ---
 
-### Tareas
+### Tasks
 
-#### `POST /api/tasks` — Crear tarea
+#### `POST /api/tasks` — Create a task
 
-> Al crear una tarea, se notifica en tiempo real al canal `/topic/sprint-tasks.{sprintId}`.
+> When a task is created, a real-time notification is sent to the `/topic/sprint-tasks.{sprintId}` channel.
 
 **Request:**
 ```json
 {
-  "titulo": "Implementar login",
-  "descripcion": "Crear endpoint POST /api/auth/login con JWT",
+  "titulo": "Implement login",
+  "descripcion": "Create POST /api/auth/login endpoint with JWT",
   "estado": "TO-DO",
   "boardId": "64b1f...",
   "sprintId": "64c2g..."
 }
 ```
 
-**Response `200 OK`:** Objeto `Task` creado.
+**Response `200 OK`:** Created `Task` object.
 
 ---
 
-#### `GET /api/tasks/board/{boardId}` — Tareas de un tablero
+#### `GET /api/tasks/board/{boardId}` — Tasks for a board
 
-**Response `200 OK`:** Lista de tareas del tablero.
-
----
-
-#### `GET /api/tasks/sprint/{sprintId}` — Tareas de un sprint
-
-**Response `200 OK`:** Lista de tareas del sprint.
+**Response `200 OK`:** List of tasks on the board.
 
 ---
 
-#### `GET /api/tasks/estado/{estado}` — Tareas por estado
+#### `GET /api/tasks/sprint/{sprintId}` — Tasks for a sprint
 
-Estados válidos: `TO-DO`, `DOING`, `DONE`
-
-**Response `200 OK`:** Lista de tareas con el estado indicado.
+**Response `200 OK`:** List of tasks in the sprint.
 
 ---
 
-#### `GET /api/tasks/{id}` — Obtener tarea por ID
+#### `GET /api/tasks/estado/{estado}` — Tasks by status
 
-**Response `200 OK`:** Objeto `Task`. `404` si no existe.
+Valid statuses: `TO-DO`, `DOING`, `DONE`
 
----
-
-#### `PUT /api/tasks` — Actualizar tarea
-
-**Request:** Objeto `Task` completo con `id`.
+**Response `200 OK`:** List of tasks with the given status.
 
 ---
 
-#### `PUT /api/tasks/{id}/estado` — Cambiar estado de una tarea
+#### `GET /api/tasks/{id}` — Get task by ID
+
+**Response `200 OK`:** `Task` object. `404` if not found.
+
+---
+
+#### `PUT /api/tasks` — Update a task
+
+**Request:** Full `Task` object including `id`.
+
+---
+
+#### `PUT /api/tasks/{id}/estado` — Change task status
 
 **Request body:** `"DOING"`
 
-**Response `200 OK`:** Objeto `Task` actualizado.
+**Response `200 OK`:** Updated `Task` object.
 
 ---
 
-#### `DELETE /api/tasks/{id}` — Eliminar tarea
+#### `DELETE /api/tasks/{id}` — Delete a task
 
 **Response `204 No Content`**
 
 ---
 
-### Mensajes
+### Messages
 
-#### `POST /api/messages` — Crear mensaje
+#### `POST /api/messages` — Create a message
 
 **Request:**
 ```json
 {
   "taskId": "64d3h...",
   "userId": "64a0e...",
-  "content": "Este endpoint está listo para revisión."
+  "content": "This endpoint is ready for review."
 }
 ```
 
-**Response `200 OK`:** Objeto `Message` creado (con `timestamp` generado por el servidor).
+**Response `200 OK`:** Created `Message` object (with server-generated `timestamp`).
 
 ---
 
-#### `GET /api/messages/task/{taskId}` — Mensajes de una tarea
+#### `GET /api/messages/task/{taskId}` — Messages for a task
 
-> Requiere autenticación.
+> Requires authentication.
 
-**Response `200 OK`:** Lista de mensajes de la tarea. `404` si no hay mensajes.
-
----
-
-#### `GET /api/messages/{id}` — Obtener mensaje por ID
-
-**Response `200 OK`:** Objeto `Message`. `404` si no existe.
+**Response `200 OK`:** List of messages for the task. `404` if no messages exist.
 
 ---
 
-#### `DELETE /api/messages/{id}` — Eliminar mensaje
+#### `GET /api/messages/{id}` — Get message by ID
+
+**Response `200 OK`:** `Message` object. `404` if not found.
+
+---
+
+#### `DELETE /api/messages/{id}` — Delete a message
 
 **Response `204 No Content`**
 
@@ -475,49 +483,49 @@ Estados válidos: `TO-DO`, `DOING`, `DONE`
 
 ## WebSocket API
 
-FlowBoard usa **STOMP sobre SockJS**. El endpoint de conexión es `/ws`.
+FlowBoard uses **STOMP over SockJS**. The connection endpoint is `/ws`.
 
-### Conectar
+### Connect
 
 ```javascript
 const socket = new SockJS('http://localhost:8080/ws');
 const stompClient = Stomp.over(socket);
-stompClient.connect({}, () => { /* conectado */ });
+stompClient.connect({}, () => { /* connected */ });
 ```
 
-### Canales disponibles
+### Available Channels
 
-| Tipo | Destino | Descripción |
+| Type | Destination | Description |
 |---|---|---|
-| **Envío** (cliente → servidor) | `/app/task/chat` | Enviar un mensaje de chat en una tarea |
-| **Envío** (cliente → servidor) | `/app/task/drag` | Notificar arrastre de una tarea entre columnas |
-| **Suscripción** (servidor → cliente) | `/topic/task-chat.{taskId}` | Recibir mensajes de chat de una tarea específica |
-| **Suscripción** (servidor → cliente) | `/topic/task-drag.{boardId}` | Recibir eventos de arrastre en un tablero |
-| **Suscripción** (servidor → cliente) | `/topic/sprint-tasks.{sprintId}` | Recibir nuevas tareas creadas en un sprint |
-| **Suscripción** (servidor → cliente) | `/topic/board-sprints.{boardId}` | Recibir nuevos sprints creados en un tablero |
+| **Send** (client → server) | `/app/task/chat` | Send a chat message on a task |
+| **Send** (client → server) | `/app/task/drag` | Notify a task drag between columns |
+| **Subscribe** (server → client) | `/topic/task-chat.{taskId}` | Receive chat messages for a specific task |
+| **Subscribe** (server → client) | `/topic/task-drag.{boardId}` | Receive drag events on a board |
+| **Subscribe** (server → client) | `/topic/sprint-tasks.{sprintId}` | Receive newly created tasks in a sprint |
+| **Subscribe** (server → client) | `/topic/board-sprints.{boardId}` | Receive newly created sprints on a board |
 
-### Ejemplo — Chat por tarea
+### Example — Per-task Chat
 
 ```javascript
-// Suscribirse al chat de la tarea
+// Subscribe to the task chat
 stompClient.subscribe('/topic/task-chat.64d3h...', (msg) => {
   console.log(JSON.parse(msg.body));
 });
 
-// Enviar un mensaje
+// Send a message
 stompClient.send('/app/task/chat', {}, JSON.stringify({
   taskId: '64d3h...',
   userId: '64a0e...',
-  content: 'Revisando este componente ahora.'
+  content: 'Reviewing this component now.'
 }));
 ```
 
-### Ejemplo — Drag & Drop en tiempo real
+### Example — Real-time Drag & Drop
 
 ```javascript
 stompClient.subscribe('/topic/task-drag.64b1f...', (event) => {
   const { taskId, fromStatus, toStatus } = JSON.parse(event.body);
-  // Actualizar UI localmente
+  // Update UI locally
 });
 
 stompClient.send('/app/task/drag', {}, JSON.stringify({
@@ -531,82 +539,125 @@ stompClient.send('/app/task/drag', {}, JSON.stringify({
 
 ---
 
-## Scripts útiles
+## Useful Scripts
 
-| Comando | Descripción |
+| Command | Description |
 |---|---|
-| `./mvnw spring-boot:run` | Iniciar la aplicación en modo desarrollo |
-| `./mvnw clean package` | Compilar y empaquetar el proyecto en un JAR |
-| `./mvnw test` | Ejecutar la suite de pruebas |
-| `./mvnw clean package -DskipTests` | Empaquetar sin ejecutar pruebas |
-| `java -jar target/FlowBoard-0.0.1-SNAPSHOT.jar` | Ejecutar el JAR empaquetado |
+| `./mvnw spring-boot:run` | Start the application in development mode |
+| `./mvnw clean package` | Compile and package the project into a JAR |
+| `./mvnw test` | Run the test suite |
+| `./mvnw clean package -DskipTests` | Package without running tests |
+| `java -jar target/FlowBoard-0.0.1-SNAPSHOT.jar` | Run the packaged JAR |
 
 ---
 
-## Pruebas
+## Testing
 
-El proyecto incluye pruebas de integración basadas en **Spring Boot Test** y **Spring Security Test**.
+The project includes integration tests based on **Spring Boot Test** and **Spring Security Test**.
 
 ```bash
 ./mvnw test
 ```
 
-Las pruebas se encuentran en `src/test/java/escuelaing/edu/arsw/FlowBoard/`.
+Tests are located in `src/test/java/escuelaing/edu/arsw/FlowBoard/`.
 
 ---
 
-## Despliegue
+## Deployment
 
-### Azure (configuración actual)
+### Azure (current configuration)
 
-El backend está configurado para aceptar conexiones WebSocket desde los siguientes orígenes:
+The backend is configured to accept WebSocket connections from the following origins:
 
-- `https://happy-bush-0e0054b0f.2.azurestaticapps.net` (frontend en Azure Static Web Apps)
-- `http://localhost:3000` (entorno local)
+- `https://happy-bush-0e0054b0f.2.azurestaticapps.net` (frontend on Azure Static Web Apps)
+- `http://localhost:3000` (local development)
 
-Para desplegar el backend en Azure App Service:
+To deploy the backend to Azure App Service:
 
-1. Empaquetar la aplicación:
+1. Package the application:
    ```bash
    ./mvnw clean package -DskipTests
    ```
 
-2. Configurar la variable de entorno `MONGODB_URI` en la configuración de la aplicación de Azure.
+2. Set the `MONGODB_URI` environment variable in the Azure application configuration.
 
-3. Subir el JAR generado en `target/FlowBoard-0.0.1-SNAPSHOT.jar` a Azure App Service.
+3. Upload the generated JAR at `target/FlowBoard-0.0.1-SNAPSHOT.jar` to Azure App Service.
 
-Para añadir nuevos orígenes permitidos, editar `src/main/java/escuelaing/edu/arsw/FlowBoard/config/WebSocketConfig.java`.
+To add new allowed origins, edit `src/main/java/escuelaing/edu/arsw/FlowBoard/config/WebSocketConfig.java`.
 
 ---
 
-## Contribución
+## CI/CD
 
-¡Las contribuciones son bienvenidas! Por favor, sigue estos pasos:
+FlowBoard uses **GitHub Actions** to automate continuous integration and deployment. The pipeline is defined in `.github/workflows/main_flowboard.yml`.
 
-1. Haz un **fork** del repositorio.
-2. Crea una rama descriptiva para tu feature o corrección:
+### Triggers
+
+| Event | Branch | Description |
+|---|---|---|
+| `push` | `main` | Automatically runs the pipeline when changes are merged into the main branch |
+| `workflow_dispatch` | any | Allows the pipeline to be triggered manually from the GitHub UI |
+
+### Pipeline Stages
+
+The pipeline consists of two sequential jobs: `build` → `deploy`.
+
+#### 1. `build` — Compile & Package
+
+| Step | Action / Command | Description |
+|---|---|---|
+| Checkout | `actions/checkout@v4` | Clones the repository source code |
+| Set up Java | `actions/setup-java@v4` | Configures Java 17 (Microsoft distribution) |
+| Build & test | `mvn clean install` | Compiles the project, runs the test suite, and generates the JAR |
+| Upload artifact | `actions/upload-artifact@v4` | Publishes the JAR (`target/*.jar`) for the deploy job |
+
+> **Secrets management:** The `MONGODB_URI` variable is injected as a GitHub Secret during the build (`secrets.MONGODB_URI`), keeping credentials out of source code.
+
+#### 2. `deploy` — Deploy to Azure
+
+| Step | Action | Description |
+|---|---|---|
+| Download artifact | `actions/download-artifact@v4` | Retrieves the JAR produced in the previous stage |
+| Authenticate to Azure | `azure/login@v2` | Authenticates via OIDC (Workload Identity Federation) using service credentials stored as GitHub Secrets |
+| Deploy | `azure/webapps-deploy@v3` | Deploys the JAR to the `Production` slot of the `Flowboard` Azure App Service |
+
+Azure authentication uses federated credentials (client ID, tenant ID, and subscription ID) stored as GitHub Secrets — no long-lived keys or passwords in the repository.
+
+### Branch Strategy & Environment Promotion
+
+- The **`main`** branch is the production branch. Every push to `main` automatically triggers a new deployment to the Azure production environment.
+- It is recommended to work on feature branches (`feature/<name>`) and open a **Pull Request** targeting `main` for review before merging (see [Contributing](#contributing)).
+
+---
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. **Fork** the repository.
+2. Create a descriptive branch for your feature or fix:
    ```bash
-   git checkout -b feature/nueva-funcionalidad
+   git checkout -b feature/new-feature
    ```
-3. Realiza tus cambios con commits claros y descriptivos.
-4. Asegúrate de que las pruebas existentes siguen pasando:
+3. Make your changes with clear and descriptive commits.
+4. Ensure existing tests still pass:
    ```bash
    ./mvnw test
    ```
-5. Abre un **Pull Request** describiendo los cambios realizados.
+5. Open a **Pull Request** describing the changes made.
 
-### Guías de estilo
+### Style Guidelines
 
-- Seguir las convenciones de nombres de Java (camelCase para variables y métodos, PascalCase para clases).
-- Documentar los nuevos endpoints en este README.
-- No incluir secretos, credenciales ni datos sensibles en el código fuente.
-
----
-
-## Licencia
-
-Este proyecto está distribuido bajo la licencia **Apache 2.0**.
+- Follow Java naming conventions (camelCase for variables and methods, PascalCase for classes).
+- Document new endpoints in this README.
+- Do not include secrets, credentials, or sensitive data in source code.
 
 ---
 
-*FlowBoard — colaboración ágil, simple y en tiempo real.*
+## License
+
+This project is distributed under the **Apache 2.0** license.
+
+---
+
+*FlowBoard — agile collaboration, simple and real-time.*
