@@ -77,7 +77,7 @@ FlowBoard is a concurrent backend built with **Spring Boot** that exposes a REST
 
 ```mermaid
 classDiagram
-direction TB
+direction LR
 
 namespace model {
   class User {
@@ -137,37 +137,37 @@ namespace model {
 }
 
 namespace repository {
-  class UserRepository <<Repository>>
-  class TeamRepository <<Repository>>
-  class BoardRepository <<Repository>>
-  class ColumnRepository <<Repository>>
-  class SprintRepository <<Repository>>
-  class TaskRepository <<Repository>>
-  class MessageRepository <<Repository>>
+  class UserRepository
+  class TeamRepository
+  class BoardRepository
+  class ColumnRepository
+  class SprintRepository
+  class TaskRepository
+  class MessageRepository
 }
 
 namespace service {
-  class UserService <<Service>>
-  class TeamService <<Service>>
-  class BoardService <<Service>>
-  class SprintService <<Service>>
-  class TaskService <<Service>>
-  class MessageService <<Service>>
+  class UserService
+  class TeamService
+  class BoardService
+  class SprintService
+  class TaskService
+  class MessageService
 }
 
 namespace controller {
-  class UserController <<REST>>
-  class AuthController <<REST>>
-  class TeamController <<REST>>
-  class BoardController <<REST>>
-  class SprintController <<REST>>
-  class TaskController <<REST>>
-  class MessageController <<REST>>
+  class UserController
+  class AuthController
+  class TeamController
+  class BoardController
+  class SprintController
+  class TaskController
+  class MessageController
 }
 
 namespace webSocket {
-  class TaskChatWebSocketController <<WebSocket>>
-  class TaskDragWebSocketController <<WebSocket>>
+  class TaskChatWebSocketController
+  class TaskDragWebSocketController
   class TaskDragEvent
 }
 
@@ -176,7 +176,7 @@ namespace dto {
   class LoginDTO
 }
 
-class JwtUtil <<Utility>>
+class JwtUtil
 
 Team "1" --> "1..*" User : memberIds
 Team "1" --> "0..*" User : pendingInvitations
