@@ -136,48 +136,6 @@ namespace model {
   }
 }
 
-namespace repository {
-  class UserRepository
-  class TeamRepository
-  class BoardRepository
-  class ColumnRepository
-  class SprintRepository
-  class TaskRepository
-  class MessageRepository
-}
-
-namespace service {
-  class UserService
-  class TeamService
-  class BoardService
-  class SprintService
-  class TaskService
-  class MessageService
-}
-
-namespace controller {
-  class UserController
-  class AuthController
-  class TeamController
-  class BoardController
-  class SprintController
-  class TaskController
-  class MessageController
-}
-
-namespace webSocket {
-  class TaskChatWebSocketController
-  class TaskDragWebSocketController
-  class TaskDragEvent
-}
-
-namespace dto {
-  class UserDTO
-  class LoginDTO
-}
-
-class JwtUtil
-
 Team "1" --> "1..*" User : memberIds
 Team "1" --> "0..*" User : pendingInvitations
 Board "1" --> "1" Team : teamId
@@ -187,40 +145,6 @@ Task "0..*" --> "1" Board : boardId
 Task "0..*" --> "0..1" Sprint : sprintId
 Message "0..*" --> "1" Task : taskId
 Message "0..*" --> "1" User : userId
-
-UserRepository --> User
-TeamRepository --> Team
-BoardRepository --> Board
-ColumnRepository --> Column
-SprintRepository --> Sprint
-TaskRepository --> Task
-MessageRepository --> Message
-
-UserService --> UserRepository
-TeamService --> TeamRepository
-TeamService --> UserService
-BoardService --> BoardRepository
-SprintService --> SprintRepository
-TaskService --> TaskRepository
-TaskService --> TaskDragWebSocketController
-MessageService --> MessageRepository
-
-UserController --> UserService
-AuthController --> UserService
-AuthController --> JwtUtil
-TeamController --> TeamService
-TeamController --> UserService
-TeamController --> BoardService
-BoardController --> BoardService
-SprintController --> SprintService
-SprintController --> TaskService
-TaskController --> TaskService
-MessageController --> MessageService
-
-TaskChatWebSocketController --> MessageService
-TaskDragWebSocketController --> TaskDragEvent
-AuthController --> LoginDTO
-UserController --> UserDTO
 ```
 
 ---
