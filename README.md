@@ -50,16 +50,7 @@ FlowBoard is a concurrent backend built with **Spring Boot** that exposes a REST
 
 ## Architecture & Tech Stack
 
-```
-┌──────────────────────┐        REST / WebSocket         ┌───────────────────────┐
-│   Frontend (React)   │ ◄─────────────────────────────► │  Backend (Spring Boot) │
-│  Azure Static Web    │                                  │    Java 17 / Maven     │
-└──────────────────────┘                                  └──────────┬────────────┘
-                                                                     │
-                                                          ┌──────────▼────────────┐
-                                                          │    MongoDB Atlas       │
-                                                          └───────────────────────┘
-```
+![Architecture-Diagram](resources/Infraestructure.jpg)
 
 | Layer | Technology |
 |---|---|
