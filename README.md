@@ -77,7 +77,7 @@ FlowBoard is a concurrent backend built with **Spring Boot** that exposes a REST
 
 ```mermaid
 classDiagram
-direction LR
+direction TB
 
 namespace model {
   class User {
@@ -179,7 +179,7 @@ namespace dto {
 class JwtUtil <<Utility>>
 
 Team "1" --> "1..*" User : memberIds
-Team "1" --> "0..*" User : pendingInvitations(email)
+Team "1" --> "0..*" User : pendingInvitations
 Board "1" --> "1" Team : teamId
 Column "0..*" --> "1" Board : boardId
 Sprint "0..*" --> "1" Board : boardId
